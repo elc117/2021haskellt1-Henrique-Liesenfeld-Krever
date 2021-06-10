@@ -19,5 +19,5 @@ nenhum gradiente
  o nome pode ser alterado no código na linha 89
 
 # IMPORTANTE #
-# Recomendo manter o arquivo do jeito que ele está, qualquer mudança pode acarretar em uma desconfiguração do cabal, porém o código fonte de 
-'Main.hs' pode ser modificado ao seu bel prazer
+# Recomendo manter o arquivo do jeito que ele está, qualquer mudança pode acarretar em uma desconfiguração do cabal, 
+porém o código fonte de 'Main.hs' pode ser modificado ao seu bel prazer
