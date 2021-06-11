@@ -12,17 +12,10 @@ type Circle    = (Point,Int)
 -- Paletas
 -------------------------------------------------------------------------------
 
--- Paleta (R, G, B) só com tons de verde "hard-coded" 
--- (pode ser melhorado substituindo os valores literais por parâmetros)
--- Além disso, o que acontecerá se n for muito grande ou negativo?
-greenPalette :: Int -> [(Int,Int,Int)]
-greenPalette n = [(0, 80+i*10, 0) | i <- [0..n] ]
-
 -- Paleta com n valores retirados de uma lista com sequências de R, G e B 
--- O '$' é uma facilidade sintática que substitui parênteses
--- O cycle é uma função bacana -- procure saber mais sobre ela :-)
+
 rgbPalette :: Int -> Int -> Int -> Int -> [(Int,Int,Int)]
-rgbPalette r1 g1 b1 n = take n [(r,g,b)| r <- [0,1..r1], g <- [0,3..g1], b <- [0,7..b1]]
+rgbPalette r1 g1 b1 n = take n $ cycle [(r,g,b)| r <- [0,1..r1], g <- [0,3..g1], b <- [0,7..b1]]
 
 
 
@@ -35,10 +28,8 @@ genRectsInLine n  = [if y < 9 then(((w+gap)*y, y*(h+gap)), w, h) else (((w+gap)*
   where (w,h) = (50,50)
         gap = 10
 
-genCircles :: Int -> [Circle]
-genCircles n = [((round(x*7.25)-100,y*170),170) |y <- reverse [0..fromIntegral 2], x <- reverse[0..fromIntegral 1500]]
- where
-   (w,h)=(1500,500)
+genCircles :: (Int,Int) -> Int -> [Circle]
+genCircles wh n = [((round(x*7.25)-100,(y*(snd wh) `div` 3)+1),snd wh `div` 3) |y <- reverse [0..fromIntegral 2], x <- reverse[0..fromIntegral (fst(wh))]]
 
 -------------------------------------------------------------------------------
 -- Strings SVG
@@ -72,8 +63,6 @@ svgStyle (r,g,b) = printf "rgb(%d, %d ,%d, 1)" r g b
 svgElements :: (a -> String -> String) -> [a] -> [String] -> String
 svgElements func elements styles = concat $ zipWith func elements styles
 
---aleatorio :: Int
---aleatorio = randomRIO (0,255::Int)
 -------------------------------------------------------------------------------
 -- Função principal que gera arquivo com imagem SVG
 -------------------------------------------------------------------------------
@@ -82,17 +71,18 @@ main = do
   r <- randomRIO(0,255::Int) 
   g <- randomRIO(0,255::Int) 
   b <- randomRIO(0,255::Int) 
-  lala r g b
+  desenha r g b
   
-lala :: Int -> Int -> Int -> IO ()
-lala r g b = do
+desenha :: Int -> Int -> Int -> IO ()
+desenha r g b = do
   writeFile "Henrique_e_suas_incríveis_habilidades_em_haskell.svg" $ svgstrs
   where svgstrs = svgBegin w h ++ svgfigs ++ svgEnd
         svgfigs = svgElements svgCircle circles (map svgStyle palette)
         palette = rgbPalette r g b ncircles
-        circles = genCircles ncircles
-        ncircles = 4500
+        circles = genCircles (w,h) ncircles
+        ncircles = w*3
         (w,h) = (1500,500) -- width,height da imagem SVG
+        -- altura e largura pode ser mudado
 
 
 
